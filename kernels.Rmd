@@ -1,0 +1,77 @@
+---
+title: "kernels"
+author: "Jordi"
+date: "11/28/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd(".")
+```
+
+## Load the data
+
+```{r}
+gen = read.csv("data/cannabis_gen.csv")
+head(gen)
+```
+
+Now we separate the ID
+```{r}
+gen = gen[2:175]
+```
+
+### Prepare fols for k-CV
+
+```{r}
+k = 10
+N = dim(gen)[1]
+k.folds = sample(rep(1:k, length=N), N, replace=FALSE)
+```
+
+
+## Prepare different models
+```{r}
+library(e1071) # module for svm()
+```
+
+
+```{r}
+train.svm.kCV <- function (dataset, which.kernel, mycost, folds)
+{
+  valid.error <- rep(0,k)
+  for (i in 1:k) 
+  {  
+    train <- dataset[folds!=i,] # for building the model (training)
+    valid <- dataset[folds==i,] # for prediction (validation)
+    
+    x_train <- train[,1:173]
+    t_train <- train[,174]
+    
+    model <- svm(x_train, t_train, type="C-classification", cost=mycost, kernel=which.kernel, scale = FALSE)
+    
+    x_valid <- valid[,1:173]
+    pred <- predict(model,x_valid)
+    t_true <- valid[,174]
+    
+    # compute validation error for part 'i'
+    valid.error[i] <- sum(pred != t_true)/length(t_true)
+  }
+  # return average validation error
+  sum(valid.error)/length(valid.error)
+}
+```
+
+Try if the function works
+```{r}
+c = 1
+train.svm.kCV(gen, "linear", c, k.folds)
+```
+
+### To do
+
+We need a function to optimize the `cost` parameter (with kCV for example).
+
+We need to choose the best kernel for the data.
+
