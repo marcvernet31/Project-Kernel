@@ -22,7 +22,7 @@ Now we separate the ID
 gen = gen[2:175]
 ```
 
-### Prepare fols for k-CV
+### Prepare folds for k-CV
 
 ```{r}
 k = 10
@@ -34,6 +34,19 @@ k.folds = sample(rep(1:k, length=N), N, replace=FALSE)
 ## Prepare different models
 ```{r}
 library(e1071) # module for svm()
+library(kernlab)
+```
+
+```{r}
+# exemple de custom kernel
+# Jaccard similarity
+kp=function(d,e){
+  intersection = length(intersect(d,e))
+  union = 2*length(d) - intersection
+  return (intersection / union)
+}
+
+class(kp)="kernel"
 ```
 
 
@@ -41,7 +54,8 @@ library(e1071) # module for svm()
 train.svm.kCV <- function (dataset, which.kernel, mycost, folds)
 {
   valid.error <- rep(0,k)
-  for (i in 1:k) 
+  for (i in 1:k)
+  #for (i in 1:1) 
   {  
     train <- dataset[folds!=i,] # for building the model (training)
     valid <- dataset[folds==i,] # for prediction (validation)
@@ -49,7 +63,9 @@ train.svm.kCV <- function (dataset, which.kernel, mycost, folds)
     x_train <- train[,1:173]
     t_train <- train[,174]
     
-    model <- svm(x_train, t_train, type="C-classification", cost=mycost, kernel=which.kernel, scale = FALSE)
+    #model <- svm(x_train, t_train, type="C-classification", cost=mycost, kernel=which.kernel, scale = FALSE)
+    # funcio per custom kernels
+    model <- ksvm(as.matrix(x_train), as.factor(t_train), type="C-svc", cost=mycost, kernel=which.kernel, scale = FALSE)
     
     x_valid <- valid[,1:173]
     pred <- predict(model,x_valid)
@@ -66,7 +82,7 @@ train.svm.kCV <- function (dataset, which.kernel, mycost, folds)
 Try if the function works
 ```{r}
 c = 1
-train.svm.kCV(gen, "linear", c, k.folds)
+train.svm.kCV(gen, kp, c, k.folds)
 ```
 
 ### To do
@@ -74,4 +90,16 @@ train.svm.kCV(gen, "linear", c, k.folds)
 We need a function to optimize the `cost` parameter (with kCV for example).
 
 We need to choose the best kernel for the data.
+
+### Idees de recerca
+
+Calcular matrius de kernel amb diferents funcions i fer heatmaps per visualitzar
+
+Comprovar si amb kernel methods i utilitzant un conjunt de training més petit es pot obtindre bons resultats
+
+Comparació del temps d'execució
+
+Applicar el kernel per missing data que ens va explicar
+
+Provar d'aplicar un kernel PCA i compararlo amb el PCA normal
 
