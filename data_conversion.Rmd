@@ -1,0 +1,90 @@
+---
+title: "Data recodification"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The objective of this code is to convert the genetic dataset from the original numeric dataset to a categoric one
+
+```{r}
+setwd(".")
+data <- read.csv(file = "data/CannabisGenotypes.csv", sep = ",", header=TRUE)
+data = transform(data, 
+                 A201 = as.integer(levels(A201))[A201], 
+                 A301 = as.integer(levels(A301))[A301], 
+                 A303 = as.integer(levels(A303))[A303],
+                 A305 = as.integer(levels(A305))[A305],
+                 P15 = as.integer(levels(P15))[P15],
+                 A202 = as.integer(levels(A202))[A202],
+                 A302 = as.integer(levels(A302))[A302],
+                 A501 = as.integer(levels(A501))[A501],
+                 C11_C1 = as.integer(levels(C11_C1))[C11_C1],
+                 B02_C2 = as.integer(levels(B02_C2))[B02_C2],
+                 A304 = as.integer(levels(A304))[A304],
+                 B05_C1 = as.integer(levels(B05_C1))[B05_C1],
+                 B01_C1 = as.integer(levels(B01_C1))[B01_C1]
+)
+
+head(data)
+```
+
+
+NA (missing values) filled with the median of each column
+```{r}
+for (i in 2:27){
+    m = median(data[,i], na.rm=TRUE)
+    data[,i][is.na(data[,i])] = m
+}
+```
+
+Data conversion
+```{r}
+dataMatrix = matrix(-1, nrow = nrow(data), ncol = 1)
+v = c(1:13) * 2
+for(loc1 in v){
+  loc2 = loc1 + 1
+  data[,loc1] = as.factor(data[,loc1])
+  data[,loc2] = as.factor(data[,loc2])
+
+  lv1 = levels(data[,loc1])
+  lv2 = levels(data[,loc2])
+  lv = as.numeric(unique(lv1, lv2))
+
+  newData = matrix(0, nrow = nrow(data), ncol = length(lv))
+  for(i in 1:nrow(data)){
+    for (j in 1:length(lv)){
+      if(data[i,loc1] == data[i,loc2]){
+        if(data[i,loc1] == lv[j]){
+          newData[i,j] = 2
+        }
+      }
+      else if(data[i,loc1] != lv[j] && data[i,loc2] == lv[j]){
+        newData[i,j] = 1
+      }
+      else if(data[i,loc1] == lv[j] && data[i,loc2] != lv[j]){
+        newData[i,j] = 1
+      }
+    }
+  }
+  dataMatrix = cbind(dataMatrix, newData)
+}
+
+```
+
+From matrix to dataframe
+```{r}
+data = as.data.frame(dataMatrix)
+#data$V1 = train$ID
+n = as.character(0:173)
+names(data) = paste("V", n, sep="")
+names(data)[1] = "ID"
+head(data)
+```
+
+
+Save as .csv file
+```{r}
+write.csv(data,"conversion.csv", row.names = FALSE)
+```

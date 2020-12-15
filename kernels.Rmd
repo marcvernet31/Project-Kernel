@@ -1,8 +1,10 @@
 ---
 title: "kernels"
-author: "Jordi"
+author: "Marc Vernet and Jordi Puig"
 date: "11/28/2020"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -13,13 +15,14 @@ setwd(".")
 ## Load the data
 
 ```{r}
-gen = read.csv("data/cannabis_gen.csv")
-head(gen)
+gen_raw = read.csv("data/cannabis_gen.csv")
+head(gen_raw)
 ```
 
 Now we separate the ID
 ```{r}
-gen = gen[2:175]
+gen = gen_raw[2:175]
+X = gen[1:173]
 ```
 
 ### Prepare folds for k-CV
@@ -94,6 +97,56 @@ We need to choose the best kernel for the data.
 ### Idees de recerca
 
 Calcular matrius de kernel amb diferents funcions i fer heatmaps per visualitzar
+
+```{r}
+kp=function(d,e){
+  intersection = length(intersect(d,e))
+  union = 2*length(d) - intersection
+  return (intersection / union)
+}
+
+class(kp)="kernel"
+
+some.kernel = function(d, e) {
+  n = length(d)
+  sim = 0
+  for (i in c(1:n)) {
+    if (d[i] == e[i]) {
+      sim = sim + d[i]
+    }
+  }
+  sum = sum(d)
+  return(sim/sum)
+}
+class(some.kernel) = "kernel"
+```
+
+```{r}
+c = 1
+train.svm.kCV(gen, some.kernel, c, k.folds)
+```
+
+
+```{r}
+compute.kernel.matrix = function(dd, kernel) {
+  n  = dim(dd)[1]
+  k.matrix = matrix(nrow = n, ncol = n)
+  for (i in c(1:n)) {
+    for (j in c(1:n)) {
+      k.matrix[i,j] = kernel(dd[i,], dd[j,])
+    }
+  }
+  return(k.matrix)
+}
+
+jaccard = compute.kernel.matrix(X, kp)
+```
+
+```{r}
+heatmap(jaccard)
+```
+
+
 
 Comprovar si amb kernel methods i utilitzant un conjunt de training més petit es pot obtindre bons resultats
 
