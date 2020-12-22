@@ -27,3 +27,33 @@ class CannabisGenotype(Dataset):
                     head = False
         X, y = np.array(X), np.array(y)
         return X, y
+
+class CannabisOneHot(Dataset):
+    def generate(self):
+        X, y = [], []
+        with open("data/cannabis_one_hot.csv", "r") as data:
+            head = True
+            for line in data:
+                if not head:
+                    seq = line.split(',')
+                    y.append(int(seq[-2]))
+                    X.append([float(x.strip()) for x in seq[1:-3]])
+                else:
+                    head = False
+        X, y = np.array(X), np.array(y)
+        return X, y
+
+class CannabisOneHot2(Dataset):
+    def generate(self):
+        X, y = [], []
+        with open("data/genotype_onehot_per_columns.csv", "r") as data:
+            head = True
+            for line in data:
+                if not head:
+                    seq = line.split(',')
+                    y.append(int(seq[-2]))
+                    X.append([float(x.strip()) for x in seq[1:-3]])
+                else:
+                    head = False
+        X, y = np.array(X), np.array(y)
+        return X, y
