@@ -13,6 +13,17 @@ class Dataset:
     def train_test_split(self, testSize = 0.3, randomState = 0):
         return tts(*self.data_arrays, test_size=testSize, random_state=randomState)
 
+class SmallDataset():
+    def __init__(self, testSize = 0.7, *args, **kwargs):
+        self.data_arrays = self.generate()
+        self.test_size = testSize
+
+    def generate(self):
+        raise NotImplementedError
+
+    def train_test_split(self, randomState = 0):
+        return tts(*self.data_arrays, test_size=self.testSize, random_state=randomState)
+
 class CannabisGenotype(Dataset):
     def generate(self):
         X, y = [], []
@@ -43,10 +54,40 @@ class CannabisOneHot(Dataset):
         X, y = np.array(X), np.array(y)
         return X, y
 
-class CannabisOneHot2(Dataset):
+class CannabisDummies(Dataset):
     def generate(self):
         X, y = [], []
-        with open("data/genotype_onehot_per_columns.csv", "r") as data:
+        with open("data/cannabis_genotype_dummies.csv", "r") as data:
+            head = True
+            for line in data:
+                if not head:
+                    seq = line.split(',')
+                    y.append(int(seq[-2]))
+                    X.append([float(x.strip()) for x in seq[1:-3]])
+                else:
+                    head = False
+        X, y = np.array(X), np.array(y)
+        return X, y
+
+class SmallOneHot(SmallDataset):
+    def generate(self):
+        X, y = [], []
+        with open("data/cannabis_one_hot.csv", "r") as data:
+            head = True
+            for line in data:
+                if not head:
+                    seq = line.split(',')
+                    y.append(int(seq[-2]))
+                    X.append([float(x.strip()) for x in seq[1:-3]])
+                else:
+                    head = False
+        X, y = np.array(X), np.array(y)
+        return X, y
+
+class SmallDummies(SmallDataset):
+    def generate(self):
+        X, y = [], []
+        with open("data/cannabis_genotype_dummies.csv", "r") as data:
             head = True
             for line in data:
                 if not head:
