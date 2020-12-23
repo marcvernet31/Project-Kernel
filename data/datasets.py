@@ -27,13 +27,31 @@ class Dataset:
 class CannabisGenotype(Dataset):
     def generate(self):
         X, y = [], []
-        with open("data/cannabis_gen.csv", "r") as data:
+        with open("data/labeledGenotype.csv", "r") as data:
             head = True
             for line in data:
                 if not head:
                     seq = line.split(',')
-                    y.append(int(seq[-1][1:-2]))
-                    X.append([int(x.strip()) for x in seq[1:-1]])
+                    y.append(int(seq[3]))
+                    X.append([int(x.strip()) for x in seq[4:]])
+                else:
+                    head = False
+        X, y = np.array(X), np.array(y)
+        return X, y
+
+class CannabisGenotype2(Dataset):
+    def generate(self):
+        X, y = [], []
+        with open("data/labeledGenotype.csv", "r") as data:
+            head = True
+            for line in data:
+                if not head:
+                    seq = line.split(',')
+                    y.append(int(seq[3]))
+                    x = []
+                    for i in range(4, len(seq), 2):
+                        x.append((seq[i].strip(), seq[i+1].strip()))
+                    X.append(x)
                 else:
                     head = False
         X, y = np.array(X), np.array(y)

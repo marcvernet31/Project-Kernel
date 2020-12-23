@@ -5,3 +5,4 @@
 Project-AA2.Rproj
 compute
 .ipynb_checkpoints
+*__pycache__*
