@@ -6,6 +6,20 @@ from sklearn.model_selection import cross_val_score
 
 import numpy as np
 
+# function to time the functions
+import time
+def timeit(method):
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+
+        print('%r : %2.2f sec' %
+              (method.__name__, te - ts))
+        return result
+
+    return timed
+
 @timeit
 def timed_k_fold_CV(model, X, y, folds):
     acc = np.mean(cross_val_score(model, X, y, cv=folds))
