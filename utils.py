@@ -59,3 +59,7 @@ def cross_val_small_datasets(dataset, my_kernel, n_folds=5):
         # model = svm.SVC(kernel = my_kernel, C=1) isok
         acc.append(k_fold_CV(model, X, y, 3))
     return np.mean(acc)
+
+def optimize_C(kernel, X, y, folds, lbound, ubound):
+    n = 100
+    it = np.tile(lbound, n)
