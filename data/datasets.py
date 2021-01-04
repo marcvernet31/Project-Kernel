@@ -24,7 +24,7 @@ class Dataset:
             y_te_sets.append(self.data_arrays[1][test])
         return X_tr_sets, X_te_sets, y_tr_sets, y_te_sets
 
-class CannabisGenotype(Dataset):
+class CannabisGenotype2(Dataset):
     def generate(self):
         X, y = [], []
         with open("data/labeledGenotype.csv", "r") as data:
@@ -39,7 +39,7 @@ class CannabisGenotype(Dataset):
         X, y = np.array(X), np.array(y)
         return X, y
 
-class CannabisGenotype2(Dataset):
+class CannabisGenotype(Dataset):
     def generate(self):
         X, y = [], []
         with open("data/labeledGenotype.csv", "r") as data:
