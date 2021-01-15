@@ -10,9 +10,9 @@ The main task is to classify cannabis plants into two groups: _marijuana_ and _h
 
 In this repository it can find all the code used to develop the whole project, moreover a notebook with the results is provided. Other notebooks with the preprocess of the raw data are provided as well.
 
-* Results notebook
+* [Results notebook](https://nbviewer.jupyter.org/github/marcvernet31/Project-Kernel/blob/master/to-deliver.ipynb)
 
-* Preprocess notebook
+* [Preprocess notebook](https://nbviewer.jupyter.org/github/marcvernet31/Project-Kernel/blob/master/Preprocess.ipynb)
 
 
 ## Work Report
